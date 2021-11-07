@@ -1,97 +1,115 @@
-function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}const sounds = [
-{
-  key: 'Q',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-1.mp3' },
+function _defineProperty(obj, key, value) {if (key in obj) {Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true });} else {obj[key] = value;}return obj;}const nums = [7, 8, 9, 4, 5, 6, 1, 2, 3, 0];
+const ops = ['/', '*', '-', '+'];
+const ids = {
+  7: 'seven',
+  8: 'eight',
+  9: 'nine',
+  4: 'four',
+  5: 'five',
+  6: 'six',
+  1: 'one',
+  2: 'two',
+  3: 'three',
+  0: 'zero',
+  '/': 'divide',
+  '*': 'multiply',
+  '-': 'subtract',
+  '+': 'add' };
 
-{
-  key: 'W',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-2.mp3' },
 
-{
-  key: 'E',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-3.mp3' },
-
-{
-  key: 'A',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-4_1.mp3' },
-
-{
-  key: 'S',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Heater-6.mp3' },
-
-{
-  key: 'D',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Dsc_Oh.mp3' },
-
-{
-  key: 'Z',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Kick_n_Hat.mp3' },
-
-{
-  key: 'X',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/RP4_KICK_1.mp3' },
-
-{
-  key: 'C',
-  mp3: 'https://s3.amazonaws.com/freecodecamp/drums/Cev_H2.mp3' }];
+class App extends React.Component {constructor(...args) {super(...args);_defineProperty(this, "state",
+    {
+      lastPressed: undefined,
+      calc: '0',
+      operation: undefined });_defineProperty(this, "handleClick",
 
 
 
-const App = () => /*#__PURE__*/
-React.createElement("div", { id: "display", className: "display" },
-sounds.map((sound, idx) => /*#__PURE__*/
-React.createElement(DrumPad, { text: sound.key, key: idx, audio: sound.mp3 })));
+    e => {
+      const { calc, lastPressed } = this.state;
+      const { innerText } = e.target;
 
+      console.log(innerText);
 
+      switch (innerText) {
+        case 'AC':{
+            this.setState({
+              calc: '0' });
 
+            break;
+          }
+        case '=':{
+            const evaluated = eval(calc);
+            this.setState({
+              calc: evaluated });
 
-class DrumPad extends React.Component {
-  constructor(props) {
-    super(props);_defineProperty(this, "playSound",
+            break;
+          }
+        case '.':{
+            const splitted = calc.split(/[\+\-\*\/]/);
+            const last = splitted.slice(-1)[0];
 
+            if (!last.includes('.')) {
+              this.setState({
+                calc: calc + '.' });
 
+            }
 
+            break;
+          }
+        default:{
+            let e = undefined;
+            // check for other operations
+            if (ops.includes(innerText)) {
+              if (ops.includes(lastPressed) && innerText !== '-') {
+                const lastNumberIdx = calc.split('').reverse().findIndex(char => char !== ' ' && nums.includes(+char));
+                e = calc.slice(0, calc.length - lastNumberIdx) + ` ${innerText} `;
+              } else {
+                e = `${calc} ${innerText} `;
+              }
+            } else {
+              e = calc === '0' ? innerText : calc + innerText;
+            }
 
+            this.setState({
+              calc: e,
+              lastPressed: innerText });
 
-
-
-
-
-
-
-    () => {
-      this.audio.current.play();
-
-      const parent = this.audio.current.parentNode;
-      parent.classList.add('active');
+          }}
 
       this.setState({
-        currentID: this.audio.cureent.id });
+        lastPressed: innerText });
 
-    });this.audio = React.createRef();}componentDidMount() {this.audio.current.addEventListener('ended', e => {const parent = e.target.parentNode;parent.classList.remove('active');});}
+    });}
 
   render() {
-    const { text, audio } = this.props;
-
+    const { currentNumber, calc } = this.state;
     return /*#__PURE__*/(
-      React.createElement("div", { className: "drum-pad", onClick: this.playSound, id: `drum-${text}` },
-      text, /*#__PURE__*/
-      React.createElement("audio", { ref: this.audio, src: audio, className: "clip", id: text })));
+      React.createElement("div", { className: "calculator" }, /*#__PURE__*/
+      React.createElement("p", { style: { position: 'absolute', top: 0 } }, JSON.stringify(this.state, null, 2)), /*#__PURE__*/
+      React.createElement("div", { id: "display", className: "display" },
+      calc), /*#__PURE__*/
+
+      React.createElement("div", { className: "nums-container" }, /*#__PURE__*/
+      React.createElement("button", { className: "big-h light-gray ac", onClick: this.handleClick, id: "clear" }, "AC"),
+      nums.map((num, idx) => /*#__PURE__*/
+      React.createElement("button", { className: `dark-gray ${num === 0 && `big-h`}`, key: num, onClick: this.handleClick, id: ids[num] },
+      num)), /*#__PURE__*/
+
+
+      React.createElement("button", { className: "light-gray", onClick: this.handleClick, id: "decimal" }, ".")), /*#__PURE__*/
+
+      React.createElement("div", { className: "ops-container" },
+      ops.map((op, idx) => /*#__PURE__*/
+      React.createElement("button", { className: "orange", key: op, onClick: this.handleClick, id: ids[op] },
+      op)), /*#__PURE__*/
+
+
+      React.createElement("button", { className: "orange", onClick: this.handleClick, id: "equals" }, "="))));
+
 
 
   }}
 
 
-
-document.addEventListener('keydown', e => {
-  const id = e.key.toUpperCase();
-  const audio = document.getElementById(id);
-
-  if (audio) {
-    const parent = audio.parentNode;
-    parent.classList.remove('active');
-    audio.play();
-  }
-});
-
-ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById('drum-machine'));
+ReactDOM.render( /*#__PURE__*/React.createElement(App, null), document.getElementById('app'));
